@@ -16,13 +16,16 @@ class LineInfo{
 	   Dwarf_Unsigned m_line_version;
 	   Dwarf_Small m_table_count;
       Dwarf_Signed m_line_count;
-
-
-   public:
+      /** @brief Function to get the index of the Line in Line Buffer corresponding to the supplied source line. 
+       */
+         public:
 	   // Constructors
 	   int setDiePtr(Dwarf_Die die_ptr);
 	   int setLineContextAndBuffer();
-	   //Dwarf_Addr getAddressFromLine(unsigned int line);
+	   Dwarf_Unsigned getLineIndexInBuffer(Dwarf_Unsigned q_line_number);
+
+      //Dwarf_Addr getAddressFromLine(unsigned int line);
+      
 
       // destructors
       ~LineInfo();

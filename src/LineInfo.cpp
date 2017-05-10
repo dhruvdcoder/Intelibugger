@@ -5,6 +5,7 @@
 #include "../include/LineInfo.h"
 #include <stdio.h>
 #include <cstddef> //for nullptr
+#include <stdlib.h> // for exit()
 
 /** @brief Sets the Line Context for the line info. This is used later in all member functions 
  */
@@ -58,3 +59,26 @@ LineInfo::~LineInfo(){
    m_die_ptr=nullptr; 
 }
 
+
+Dwarf_Unsigned LineInfo::getLineIndexInBuffer(Dwarf_Unsigned q_line_number){
+   // impliment a brute force algo for now
+   Dwarf_Unsigned ii_lineno=0;
+   Dwarf_Unsigned ii_prev_lineno=0;
+   Dwarf_Error err;
+   for(Dwarf_Signed ii=0; ii < m_line_count ; ++ii){
+      
+      if(dwarf_lineno((*(m_line_buffer_ptr+ii)), &ii_lineno, &err)!=DW_DLV_OK){
+         fprintf(stderr,"Error : %s ,  In call to dwarf_lineno().in LineInfo::getLineIndexInBuffer().",dwarf_errmsg(err));
+               exit(1);
+      }
+      if(q_line_number>ii_lineno){ //
+         ii_prev_lineno=ii_lineno; // => (1) ii_prev_lineno always < q_line_number.        // in this if block 
+      }
+      else if (q_line_number==ii_lineno){// q_line_number <=ii_lineno
+         return (Dwarf_Unsigned)ii;
+      }
+      else {//(2) q_line_number<ii_lineno => (1)(2) => ii_prev_lineno < q_line_number < ii_lineno
+         return (Dwarf_Unsigned)ii;
+      }
+   }
+}

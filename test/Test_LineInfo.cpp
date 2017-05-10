@@ -98,6 +98,21 @@ namespace{
       t_line_info.setDiePtr(t_cu_die);
       t_line_info.setLineContextAndBuffer();
    }
+   TEST_F(LineInfoTest,testgetLineIndexInBuffer){
+      t_line_info.setDiePtr(t_cu_die);
+      t_line_info.setLineContextAndBuffer();
+      Dwarf_Unsigned i1=t_line_info.getLineIndexInBuffer(3);
+      EXPECT_EQ(Dwarf_Unsigned(0),i1);
+      Dwarf_Unsigned i2=t_line_info.getLineIndexInBuffer(4);
+      EXPECT_EQ(Dwarf_Unsigned(1),i2);
+      Dwarf_Unsigned i3=t_line_info.getLineIndexInBuffer(5);
+      EXPECT_EQ(Dwarf_Unsigned(1),i3);
+      Dwarf_Unsigned i4=t_line_info.getLineIndexInBuffer(6);
+      EXPECT_EQ(Dwarf_Unsigned(2),i4);
+      Dwarf_Unsigned i5=t_line_info.getLineIndexInBuffer(12);
+      EXPECT_EQ(Dwarf_Unsigned(5),i5);
+   
+   }
 }
 
 int main(int argc,char **argv){
