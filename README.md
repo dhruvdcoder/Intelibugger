@@ -15,6 +15,7 @@ This README would normally document whatever steps are necessary to get your app
 
 * Dependencies: libz libelf libdwarf
 sudo apt-get zlib1g zlib1g-dev libelf-dev
+
 libdwarf can be cloned and built from source : https://github.com/tomhughes/libdwarf
 
 
