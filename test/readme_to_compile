@@ -1,3 +1,9 @@
 g++ -g -std=c++11 -o Test_LineInfo Test_LineInfo.cpp ../src/LineInfo.cpp -I../include/ -I/mathworks/home/dhruvesp/Documents/dwarf-20170416/libdwarf -I/mathworks/home/dhruvesp/my_installs/include/ -L/mathworks/home/dhruvesp/my_installs/lib/ -lgtest -L//mathworks/home/dhruvesp/Documents/dwarf-20170416/libdwarf/ -ldwarf -lz -lelf
 
  setenv LD_LIBRARY_PATH /mathworks/home/dhruvesp/my_installs/lib/
+
+
+
+
+Relative paths setup. With gtest in /usr/local/
+g++ -g -std=c++11 -o Test_LineInfo Test_LineInfo.cpp ../src/LineInfo.cpp -I../include/ -I../../dwarf-20170416-build/libdwarf -L../../dwarf-20170416-build/libdwarf/ -ldwarf -lgtest -lz -lelf

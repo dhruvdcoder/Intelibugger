@@ -25,7 +25,7 @@ class LineInfo{
        */
       Dwarf_Unsigned getLineIndexInBuffer(Dwarf_Unsigned q_line_number);
       /** @brief Function which returns Address for a particular line of code.*/
-      Dwarf_Addr getAddressFromLine(Dwarf_Unsigned line);
+      Dwarf_Addr getAddressFromLine(unsigned int line);
       
 
       // destructors

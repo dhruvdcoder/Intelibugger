@@ -20,7 +20,7 @@ namespace{
       
          LineInfoTest(){
             // open the file
-            const char file[]="/mathworks/home/dhruvesp/Documents/sneak/bin/dummy";
+            const char file[]="../bin/dummy";
             t_fd = open(file,O_RDONLY); // open read only
             if(t_fd==-1){
                fprintf(stderr,"Error: Unable to open the file %s.",file);
@@ -112,6 +112,20 @@ namespace{
       Dwarf_Unsigned i5=t_line_info.getLineIndexInBuffer(12);
       EXPECT_EQ(Dwarf_Unsigned(5),i5);
    
+   }
+
+   TEST_F(LineInfoTest,testgetAddressFromLine){
+      t_line_info.setDiePtr(t_cu_die);
+      t_line_info.setLineContextAndBuffer();
+      Dwarf_Addr i1=t_line_info.getAddressFromLine(2);
+      EXPECT_EQ(Dwarf_Addr(0x0040089d),i1);
+      Dwarf_Addr i2=t_line_info.getAddressFromLine(3);
+      EXPECT_EQ(Dwarf_Addr(0x0040089d),i2);
+      Dwarf_Addr i3=t_line_info.getAddressFromLine(6);
+      EXPECT_EQ(Dwarf_Addr(0x004008ac),i3);
+
+
+
    }
 }
 

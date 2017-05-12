@@ -83,11 +83,21 @@ Dwarf_Unsigned LineInfo::getLineIndexInBuffer(Dwarf_Unsigned q_line_number){
    }
 }
 
-/** 
+/*! \brief The function which takes in the line number and returns the starting address.
  *
- * The function returns the first address corresponding to the line number
+ *  Detailed description
+ *  @todo Take in source file name as well.
+ * \param q_line Parameter description
+ * \return Return parameter description
  */
-Dwarf_Addr LineInfo::getAddressFromLine(Dwarf_Unsigned lineno) {
-   
-}
+Dwarf_Addr LineInfo::getAddressFromLine(unsigned int q_line) {
+   Dwarf_Unsigned id=getLineIndexInBuffer(q_line);
+   Dwarf_Addr line_address;
+   Dwarf_Error err;
+   if(dwarf_lineaddr(m_line_buffer_ptr[id], &line_address, &err)!=DW_DLV_OK){
+      fprintf(stderr,"Error : %s ,  In call to dwarf_lineaddr().in LineInfo::getAddressFromLine().",dwarf_errmsg(err));
+      exit(1);
+   }
+   return line_address;
 
+}
