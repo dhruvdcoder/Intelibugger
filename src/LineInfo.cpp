@@ -82,3 +82,12 @@ Dwarf_Unsigned LineInfo::getLineIndexInBuffer(Dwarf_Unsigned q_line_number){
       }
    }
 }
+
+/** 
+ *
+ * The function returns the first address corresponding to the line number
+ */
+Dwarf_Addr LineInfo::getAddressFromLine(Dwarf_Unsigned lineno) {
+   
+}
+

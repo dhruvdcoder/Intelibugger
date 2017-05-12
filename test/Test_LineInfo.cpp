@@ -1,4 +1,4 @@
-/**@file 
+/*! @file Test_LineInfo.cpp 
  * @brief Contains the tests for the class LineInfo
  */
 
