@@ -6,7 +6,7 @@ int main(){
 
    std::cout<< " Hello dummy" << std::endl;
 
-   printf("My int %d",&a);
+   printf("My int %d",a);
 
    return 1;
 }

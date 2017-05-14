@@ -24,7 +24,7 @@ class LineInfo{
 	   int setLineContextAndBuffer();
 	   Dwarf_Unsigned getLineIndexInBuffer(Dwarf_Unsigned q_line_number);
 
-      //Dwarf_Addr getAddressFromLine(unsigned int line);
+      Dwarf_Addr getAddressFromLine(unsigned int line);
       
 
       // destructors
