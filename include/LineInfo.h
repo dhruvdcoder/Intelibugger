@@ -19,6 +19,7 @@ class LineInfo{
       
          public:
 	   // Constructors
+      LineInfo();
 	   int setDiePtr(Dwarf_Die die_ptr);
 	   int setLineContextAndBuffer();
 	  /** @brief Function to get the index of the Line in Line Buffer corresponding to the supplied source line. 

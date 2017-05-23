@@ -8,7 +8,7 @@
 #include <iterator>
 #include <sys/wait.h>
 #include <sys/signal.h> // for the definition of SIGTRAP and other tokens
-
+#include "../include/Error.h"
 /** The constructor
  */
 
@@ -106,8 +106,8 @@ void Tracee::continueProc() {
  */
 void Tracee::initDwarf() {
    m_file_descriptor=open(m_name.c_str(),O_RDONLY); // open file readonly
-   if(t_fd==-1){
-      fprintf(stderr,"Error: Unable to open the file %s.",file);
+   if(m_file_descriptor==-1){
+      fprintf(stderr,"Error: Unable to open the file %s.",m_name.c_str());
       exit(1);
    }
    
@@ -166,7 +166,7 @@ void Tracee::initDwarf() {
 
 
       // Initialize the LineInfo Class
-      m_line_info.setDiePtr(t_cu_die);
+      m_line_info.setDiePtr(m_dwarf_cu_die);
      m_line_info.setLineContextAndBuffer(); 
 
 }

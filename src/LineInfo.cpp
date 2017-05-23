@@ -7,6 +7,18 @@
 #include <cstddef> //for nullptr
 #include <stdlib.h> // for exit()
 
+
+/*! \brief Brief function description here
+ *
+ *  Detailed description
+ *
+ * \return Return parameter description
+ */
+LineInfo::LineInfo():m_die_ptr(nullptr),m_line_buffer_ptr(nullptr),m_line_context(nullptr) {
+   
+}
+
+
 /** @brief Sets the Line Context for the line info. This is used later in all member functions 
  */
 

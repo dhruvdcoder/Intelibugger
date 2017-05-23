@@ -10,7 +10,9 @@
 #include <stdio.h>
 #include <errno.h> // for perror()
 #include <vector>
-
+#include "LineInfo.h"
+#include <fcntl.h> // for open()
+#include <unistd.h> // for close()
 enum ProcessStatus {
    NOT_STARTED=0,
    STOPPED_AT_FIRST_INST

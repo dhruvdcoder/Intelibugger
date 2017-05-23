@@ -1,0 +1,21 @@
+.PHONY: clean, mrproper
+CC = g++
+CFLAGS = -g -Wall -std=c++11
+ 
+LD=g++
+LDFLAGS=
+VPATH=../src:../../dwarf-20170416-build/libdwarf
+
+all: Test_BreakPoints
+
+Test_BreakPoints: Test_BreakPoints.cpp BreakPoints.cpp
+	$(CC) $(CFLAGS) -o ../bin/$@ $+ -I/mathworks/home/dhruvesp/Documents/dwarf-20170416/libdwarf -I/mathworks/home/dhruvesp/my_installs/include/ -L/mathworks/home/dhruvesp/my_installs/lib/ -lgtest -L//mathworks/home/dhruvesp/Documents/dwarf-20170416/libdwarf/ -ldwarf -lz -lelf
+
+Test_Tracee: Test_Tracee.cpp Tracee.cpp LineInfo.cpp
+	$(CC) $(CFLAGS) -o ../bin/$@ $+ -I/mathworks/home/dhruvesp/Documents/dwarf-20170416/libdwarf -I/mathworks/home/dhruvesp/my_installs/include/ -L/mathworks/home/dhruvesp/my_installs/lib/ -lgtest -L//mathworks/home/dhruvesp/Documents/dwarf-20170416/libdwarf/ -ldwarf -lz -lelf
+
+clean:
+	rm -f *.o core.*
+
+mrproper: clean
+	rm -f Test_BreakPoints
