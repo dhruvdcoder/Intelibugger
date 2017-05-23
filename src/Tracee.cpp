@@ -48,7 +48,7 @@ void Tracee::start(){
    if (child_pid==0){//child
    
    // set the pid
-      m_pid=getpid();
+     // m_pid=getpid(); Not point of setting the m_pid in the child process!
       std::cout << " Tracee process " << m_name <<" with pid" << static_cast<int>(m_pid) << " started" << std::endl;
       // Call ptrace with TRACEME to allow the parent process to trace this process
       if (ptrace(PTRACE_TRACEME,0,0,0)<0){
@@ -62,6 +62,7 @@ void Tracee::start(){
       }
    }
    else if (child_pid>0) {//parent
+         m_pid=child_pid;
          int status;
          // wait for the child to stop on its first instruction after exec()
          wait(&status); 
@@ -93,7 +94,7 @@ void Tracee::start(){
  * \return Return parameter description
  */
 void Tracee::continueProc() {
-   ptrace(PTRACE_CONT,m_pid,NULL,0);
+   if(ptrace(PTRACE_CONT,m_pid,NULL,0)<0)
    perror("Tracee::continueProc");   
 }
 

@@ -47,6 +47,7 @@ namespace{
       EXPECT_TRUE(NOT_STARTED==process.getProcessStatus());
       process.start();
       EXPECT_TRUE(STOPPED_AT_FIRST_INST==process.getProcessStatus());
+      process.continueProc();
 
       
       
