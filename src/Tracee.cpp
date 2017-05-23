@@ -1,11 +1,28 @@
 /** @file Tracee.cpp
  */
 #include "../include/Tracee.h"
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <algorithm>
+#include <iterator>
 
 /** The constructor
  */
 
-Tracee::Tracee(std::string prog):e_pid(-1),e_name(prog),args(set_args()){}
+Tracee::Tracee(std::string prog):m_pid(-1){
+   using namespace std;
+   std::istringstream iss(prog);
+   iss >> m_name; //TODO: error checking
+   copy(istream_iterator<string>(iss),istream_iterator<string>(),back_inserter(m_args_vector));
+   char** temp_args = new char* [m_args_vector.size()+1]; // allocate an array of char* 
+   int i=0;
+   temp_args[m_args_vector.size()+1]=NULL;
+   for(auto argi=m_args_vector.begin(); argi != m_args_vector.end(); ++argi){
+      temp_args[i]=const_cast<char *>(argi->c_str()); // Potentially unsafe cast
+   }
+   m_args=static_cast<char*const*>(temp_args);
+}
 
 /** 
  * 
@@ -13,25 +30,8 @@ Tracee::Tracee(std::string prog):e_pid(-1),e_name(prog),args(set_args()){}
  */
 
 Tracee::~Tracee(){
-      int i=1;
-      const char* next =args[i];
-      for(;next!=NULL;){
-         delete[] next;
-      }
-      delete[] args;
-   }
-
-/** Function to convert the args according to the requirements of ptrace
- *
- */
-char*const*  Tracee::set_args(){
-       char** temp_args = new char* [2]; // allocate an array of char* 
-       // TODO: Make a resouce managing class for the args since now you need to add a delete somewhere as you are using a new.
-      // temp_args[0]=e_name.c_str(); // the first member will point to the name of the prog
-       temp_args[0]=NULL; // since there are now args the second will point to null
-       temp_args[1]=NULL;
-      return static_cast<char*const*>(temp_args);
-
+      
+      delete[] m_args;
    }
 
 
@@ -39,17 +39,17 @@ char*const*  Tracee::set_args(){
 /** Start the Tracee
  */
 
-void Tracee::start_as_tracee(){
+void Tracee::start(){
       // set the pid
-      e_pid=getpid();
-      std::cout << " Tracee process " << e_name <<" with pid" << static_cast<int>(e_pid) << " started" << std::endl;
+      m_pid=getpid();
+      std::cout << " Tracee process " << m_name <<" with pid" << static_cast<int>(m_pid) << " started" << std::endl;
       // Call ptrace with TRACEME to allow the parent process to trace this process
       if (ptrace(PTRACE_TRACEME,0,0,0)<0){
          perror("start_as_tracee :: ptrace");
          return;
       }
       // load the given program
-      if(execv(e_name.c_str(),args)<0){
+      if(execv(m_name.c_str(),m_args)<0){
 	      perror("execv ::");
 	      return;
       }
