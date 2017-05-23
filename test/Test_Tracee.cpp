@@ -42,22 +42,10 @@ namespace{
    TEST_F(TraceeTest,teststart){
       using namespace std;
       string binary ="../bin/dummy";
-            pid_t child_pid=fork();
-      if (child_pid==0){//child
-         Tracee process (binary);
-         process.start();
-      } 
-      else if (child_pid>0) {
-         int status;
-         // wait for the child to stop on its first instruction after exec()
-         wait(&status);
-         cout << "The child has stopped on first instruction" << endl;
-         // ask the child to continue
-         ptrace(PTRACE_CONT,child_pid,NULL,0);
-      }
-      else {
-         perror("fork");
-      }
+      
+      Tracee process (binary);
+      process.start();
+      
 
    }
 

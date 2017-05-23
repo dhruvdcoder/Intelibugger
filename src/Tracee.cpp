@@ -6,6 +6,7 @@
 #include <sstream>
 #include <algorithm>
 #include <iterator>
+#include <sys/wait.h>
 
 /** The constructor
  */
@@ -40,7 +41,12 @@ Tracee::~Tracee(){
  */
 
 void Tracee::start(){
-      // set the pid
+   using namespace std;
+
+   pid_t child_pid=fork();
+   if (child_pid==0){//child
+   
+   // set the pid
       m_pid=getpid();
       std::cout << " Tracee process " << m_name <<" with pid" << static_cast<int>(m_pid) << " started" << std::endl;
       // Call ptrace with TRACEME to allow the parent process to trace this process
@@ -53,5 +59,19 @@ void Tracee::start(){
 	      perror("execv ::");
 	      return;
       }
+   }
+   else if (child_pid>0) {
+         int status;
+         // wait for the child to stop on its first instruction after exec()
+         wait(&status); 
+         cout << "The child has stopped on first instruction" << endl;
+         // ask the child to continue
+         ptrace(PTRACE_CONT,child_pid,NULL,0);
+      }
+      else {
+         perror("fork");
+         return;
+      }
+
  }
 
