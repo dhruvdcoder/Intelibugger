@@ -11,8 +11,12 @@
 #include <errno.h> // for perror()
 #include <vector>
 #include "LineInfo.h"
+#include "BreakPoints.h"
 #include <fcntl.h> // for open()
 #include <unistd.h> // for close()
+
+#define CLEARMASK 0xffffffffffffff00
+#define INT3 0xcc
 enum ProcessStatus {
    NOT_STARTED=0,
    STOPPED_AT_FIRST_INST
@@ -31,7 +35,8 @@ class Tracee {
    int m_file_descriptor; // TODO better handling of file desc in Tracee.
    Dwarf_Debug m_dwarf_dbg;
    Dwarf_Die m_dwarf_cu_die;
-   LineInfo m_line_info; 
+   LineInfo m_line_info;
+   BreakPoints m_breakpoints; 
    public:
   //getters
  inline pid_t getid(){return m_pid;}
@@ -48,6 +53,9 @@ class Tracee {
     //dwarf related
     void initDwarf();
     ProcessStatus getProcessStatus() const {return m_proc_status;}
+
+    // BreakPoints related
+    void addBreakPoint(Dwarf_Unsigned line_number,const std::string& src_file="");
 
      
 };

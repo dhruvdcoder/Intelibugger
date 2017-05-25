@@ -171,3 +171,27 @@ void Tracee::initDwarf() {
      m_line_info.setLineContextAndBuffer(); 
 
 }
+
+
+/*! \brief Brief function description here
+ *
+ *  Detailed description
+ *
+ * \param Parameter Parameter description
+ * \param Parameter Parameter description
+ * \return Return parameter description
+ */
+void Tracee::addBreakPoint(Dwarf_Unsigned line_number,const std::string& file_name/* ="" */) {
+   // @todo Put try-catch to catch if dwarf data to read the file is not initialized
+   // get the address of the instruction 
+   Dwarf_Addr inst_address=m_line_info.getAddressFromLine(line_number);
+   // get the instruction using ptrace. 
+   /** @todo Put the call to ptrace inside another member function */
+   uint64_t instruction=ptrace(PTRACE_PEEKTEXT,m_pid,(void*)(inst_address), 0);// How to know if this was successful ? !
+
+   // Write the trap instruction at the address
+   uint64_t instruction_with_trap = (instruction & CLEARMASK) | INT3; 
+   ptrace(PTRACE_POKETEXT, m_pid, (void*)(inst_address),(void*)(instruction_with_trap));
+   m_breakpoints.add(line_number, m_line_info.getAddressFromLine(line_number), instruction);
+   
+}

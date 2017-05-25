@@ -10,6 +10,8 @@
 #include <cstddef> // for nullptr
 #include <stdio.h>
 #include <iostream>
+#include <sys/signal.h> // for the definition of SIGTRAP and other tokens
+
 namespace{
    class TraceeTest : public ::testing::Test{
       public:
@@ -39,6 +41,7 @@ namespace{
       string binary ="../bin/dummy";
       Tracee process (binary);
    }
+/*
    TEST_F(TraceeTest,teststart){
       using namespace std;
       string binary ="../bin/dummy";
@@ -51,6 +54,23 @@ namespace{
 
       
       
+
+   }
+*/  
+   TEST_F(TraceeTest,testaddBreakPoint){
+      using namespace std;
+      string binary ="../bin/dummy";
+      Tracee process (binary);
+      process.initDwarf();
+      process.start();
+      process.addBreakPoint(9);
+      process.continueProc();
+      int status=0;
+      wait(&status);
+      ASSERT_TRUE(WIFSTOPPED(status));
+      ASSERT_TRUE(SIGTRAP==WSTOPSIG(status));
+      process.continueProc();
+
 
    }
 

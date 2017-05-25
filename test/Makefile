@@ -11,8 +11,8 @@ all: Test_BreakPoints
 Test_BreakPoints: Test_BreakPoints.cpp BreakPoints.cpp
 	$(CC) $(CFLAGS) -o ../bin/$@ $+ -I../../dwarf-20170416-build/libdwarf -lelf -L../../dwarf-20170416-build/libdwarf -ldwarf -lz -lgtest
 
-Test_Tracee: Test_Tracee.cpp Tracee.cpp
-	$(CC) $(CFLAGS) -o ../bin/$@ $+ -I../../dwarf-20170416-build/libdwarf -lelf -L../../dwarf-20170416-build/libdwarf -ldwarf -lz -lgtest
+Test_Tracee: Test_Tracee.cpp Tracee.cpp LineInfo.cpp BreakPoints.cpp
+	$(CC) $(CFLAGS) -o ../bin/$@ $+ -I../../dwarf-20170416-build/libdwarf -L../../dwarf-20170416-build/libdwarf -ldwarf -lelf -lz -lgtest
 
 
 clean:
