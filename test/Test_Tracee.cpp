@@ -56,7 +56,7 @@ namespace{
       
 
    }
-*/  
+ */
    TEST_F(TraceeTest,testaddBreakPoint){
       using namespace std;
       string binary ="../bin/dummy";
