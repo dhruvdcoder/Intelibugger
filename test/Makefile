@@ -18,6 +18,10 @@ OBJDIR=../obj
 
 all : Test_Tracee Test_LineInfo Test_BreakPoints
 
+.PHONY: ProcessUtils_obj
+ProcessUtils_obj : $(OBJDIR)/ProcessUtils.o
+
+
 Test_Tracee : $(OBJDIR)/Test_Tracee.o $(OBJDIR)/Tracee.o $(OBJDIR)/LineInfo.o $(OBJDIR)/BreakPoints.o
 	$(LD) $(LDFLAGS) -o ../bin/$@ $+ $(LIB_DWARF) $(LIB_GTEST)
 
@@ -26,6 +30,12 @@ Test_LineInfo : $(OBJDIR)/Test_LineInfo.o $(OBJDIR)/LineInfo.o
 
 Test_BreakPoints : $(OBJDIR)/Test_BreakPoints.o $(OBJDIR)/BreakPoints.o
 	$(LD) $(LDFLAGS) -o ../bin/$@ $+ $(LIB_DWARF) $(LIB_GTEST)
+
+Test_ProcessUtilsFork : $(OBJDIR)/Test_ProcessUtilsFork.o $(OBJDIR)/ProcessUtils.o
+	$(LD) $(LDFLAGS) -o ../bin/$@ $+ $(LIB_GTEST)
+Test_ProcessUtilsForkWithExceptions : $(OBJDIR)/Test_ProcessUtilsForkWithExceptions.o $(OBJDIR)/ProcessUtils.o
+	$(LD) $(LDFLAGS) -o ../bin/$@ $+ $(LIB_GTEST)
+
 
 # using implicit rules to build the object files
 $(OBJDIR)/BreakPoints.o : BreakPoints.cpp 
@@ -44,8 +54,13 @@ $(OBJDIR)/Test_LineInfo.o : Test_LineInfo.cpp
 
 $(OBJDIR)/Test_BreakPoints.o : Test_BreakPoints.cpp 
 	$(CXX) $(CXXFLAGS) -c -o $@ $+ $(INCLUDE_GTEST) $(INCLUDE_DWARF)
+$(OBJDIR)/ProcessUtils.o : ProcessUtils.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $+ 
 
-
+$(OBJDIR)/Test_ProcessUtilsFork.o : Test_ProcessUtilsFork.cpp 
+	$(CXX) $(CXXFLAGS) -c -o $@ $+ $(INCLUDE_GTEST) 
+$(OBJDIR)/Test_ProcessUtilsForkWithExceptions.o : Test_ProcessUtilsForkWithExceptions.cpp 
+	$(CXX) $(CXXFLAGS) -c -o $@ $+ $(INCLUDE_GTEST) 
 #all: Test_BreakPoints
 
 #Test_BreakPoints: Test_BreakPoints.cpp BreakPoints.cpp

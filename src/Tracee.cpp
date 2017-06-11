@@ -22,6 +22,7 @@ Tracee::Tracee(std::string prog):m_pid(-1),m_proc_status(NOT_STARTED){
    temp_args[m_args_vector.size()+1]=NULL;
    for(auto argi=m_args_vector.begin(); argi != m_args_vector.end(); ++argi){
       temp_args[i]=const_cast<char *>(argi->c_str()); // Potentially unsafe cast
+      i++;
    }
    m_args=static_cast<char*const*>(temp_args);
 }
@@ -35,7 +36,15 @@ Tracee::~Tracee(){
       
       delete[] m_args;
    }
-
+/*! \brief Brief function description here
+ *
+ *  Detailed description
+ *
+ * \return Return parameter description
+ */
+pid_t Tracee::getid() {
+   return m_pid;
+}
 
 
 /** Start the Tracee

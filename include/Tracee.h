@@ -37,10 +37,11 @@ class Tracee {
    Dwarf_Die m_dwarf_cu_die;
    LineInfo m_line_info;
    BreakPoints m_breakpoints; 
+
+//   void continueAfterBreakPoint(
    public:
   //getters
- inline pid_t getid(){return m_pid;}
-
+  pid_t getid();
  //constructor
 //   tracee(pid_t id):e_pid(id),e_name("unpecified name"),args(NULL) {}
    Tracee(std::string prog);
