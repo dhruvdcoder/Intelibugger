@@ -1,6 +1,7 @@
 /** @file Tracee.cpp
  */
 #include "../include/Tracee.h"
+#include "../include/ProcessUtils.h"
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -9,33 +10,23 @@
 #include <sys/wait.h>
 #include <sys/signal.h> // for the definition of SIGTRAP and other tokens
 #include "../include/Error.h"
-/** The constructor
+/** /brief Note that this constructor can throw as the initialization of process_args involves a "new" call.
  */
-
-Tracee::Tracee(std::string prog):m_pid(-1),m_proc_status(NOT_STARTED){
-   using namespace std;
-   std::istringstream iss(prog);
-   iss >> m_name; //TODO: error checking
-   copy(istream_iterator<string>(iss),istream_iterator<string>(),back_inserter(m_args_vector));
-   char** temp_args = new char* [m_args_vector.size()+1]; // allocate an array of char* 
-   int i=0;
-   temp_args[m_args_vector.size()+1]=NULL;
-   for(auto argi=m_args_vector.begin(); argi != m_args_vector.end(); ++argi){
-      temp_args[i]=const_cast<char *>(argi->c_str()); // Potentially unsafe cast
-      i++;
-   }
-   m_args=static_cast<char*const*>(temp_args);
+ 
+Tracee::Tracee(std::string prog):m_pid(-1),process_args(prog),m_proc_status(NOT_STARTED){
+      
 }
-
+ 
 /** 
  * 
  * The destructor
  */
-
+/*
 Tracee::~Tracee(){
       
       delete[] m_args;
    }
+   */
 /*! \brief Brief function description here
  *
  *  Detailed description
@@ -50,50 +41,27 @@ pid_t Tracee::getid() {
 /** Start the Tracee
  */
 
-void Tracee::start(){
+void Tracee::load(){
    using namespace std;
-
-   pid_t child_pid=fork();
-   if (child_pid==0){//child
-   
-   // set the pid
-     // m_pid=getpid(); Not point of setting the m_pid in the child process!
-      std::cout << " Tracee process " << m_name <<" with pid" << static_cast<int>(m_pid) << " started" << std::endl;
-      // Call ptrace with TRACEME to allow the parent process to trace this process
-      if (ptrace(PTRACE_TRACEME,0,0,0)<0){
-         perror("start_as_tracee :: ptrace");
-         return;
+   using namespace ProcessUtils;
+   pid_t child_pid=createChild();
+   try{
+      if (child_pid==0){//child
+         // Call ptrace with TRACEME to allow the parent process to trace this process
+         traceMe();
+         // load the given program
+         loadUsingExecv(process_args);
       }
-      // load the given program
-      if(execv(m_name.c_str(),m_args)<0){
-	      perror("execv ::");
-	      return;
+      else {//parent
+            m_pid=child_pid;
+            // wait for the child to recieve SIGTRAP and stop
+            parentWaitForSignalFromChild(SIGTRAP);
       }
    }
-   else if (child_pid>0) {//parent
-         m_pid=child_pid;
-         int status;
-         // wait for the child to stop on its first instruction after exec()
-         wait(&status); 
-         if(WIFSTOPPED(status)) {// true if the child was stopped due to a signal. Which should be the case here.
-            if(SIGTRAP!=WSTOPSIG(status)) {
-               cout<<"Child started. Stopped due to signal other than SIGTRAP"<<endl;
-               return;
-            }
-            m_proc_status=STOPPED_AT_FIRST_INST;
-            return;
-         }
-         else 
-            cout<< "Child not stopped after loading" <<endl;
-         //cout << "The child has stopped on first instruction" << endl;
-         // ask the child to continue
-         //ptrace(PTRACE_CONT,child_pid,NULL,0);
-      }
-      else {
-         perror("fork");
-         return;
-      }
-
+   catch(const ProcessException& e){
+      cout<<e.what()<<endl;
+   }
+         
  }
 
 /*! \brief Brief function description here
@@ -103,8 +71,7 @@ void Tracee::start(){
  * \return Return parameter description
  */
 void Tracee::continueProc() {
-   if(ptrace(PTRACE_CONT,m_pid,NULL,0)<0)
-   perror("Tracee::continueProc");   
+   ProcessUtils::continueChild(m_pid); 
 }
 
 
@@ -115,9 +82,9 @@ void Tracee::continueProc() {
  * \return Return parameter description
  */
 void Tracee::initDwarf() {
-   m_file_descriptor=open(m_name.c_str(),O_RDONLY); // open file readonly
+   m_file_descriptor=open(process_args.getName().c_str(),O_RDONLY); // open file readonly
    if(m_file_descriptor==-1){
-      fprintf(stderr,"Error: Unable to open the file %s.",m_name.c_str());
+      fprintf(stderr,"Error: Unable to open the file %s.",process_args.getName().c_str());
       exit(1);
    }
    
@@ -191,16 +158,15 @@ void Tracee::initDwarf() {
  * \return Return parameter description
  */
 void Tracee::addBreakPoint(Dwarf_Unsigned line_number,const std::string& file_name/* ="" */) {
+   using namespace ProcessUtils;
    // @todo Put try-catch to catch if dwarf data to read the file is not initialized
    // get the address of the instruction 
    Dwarf_Addr inst_address=m_line_info.getAddressFromLine(line_number);
    // get the instruction using ptrace. 
-   /** @todo Put the call to ptrace inside another member function */
-   uint64_t instruction=ptrace(PTRACE_PEEKTEXT,m_pid,(void*)(inst_address), 0);// How to know if this was successful ? !
-
+   uint64_t instruction=getInstruction(m_pid, inst_address);
    // Write the trap instruction at the address
-   uint64_t instruction_with_trap = (instruction & CLEARMASK) | INT3; 
-   ptrace(PTRACE_POKETEXT, m_pid, (void*)(inst_address),(void*)(instruction_with_trap));
+   uint64_t instruction_with_trap = getInstructionWithTrap(instruction);
+   setInstruction(m_pid,inst_address, instruction_with_trap);
    m_breakpoints.add(line_number, m_line_info.getAddressFromLine(line_number), instruction);
    
 }

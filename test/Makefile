@@ -22,7 +22,7 @@ all : Test_Tracee Test_LineInfo Test_BreakPoints
 ProcessUtils_obj : $(OBJDIR)/ProcessUtils.o
 
 
-Test_Tracee : $(OBJDIR)/Test_Tracee.o $(OBJDIR)/Tracee.o $(OBJDIR)/LineInfo.o $(OBJDIR)/BreakPoints.o
+Test_Tracee : $(OBJDIR)/Test_Tracee.o $(OBJDIR)/Tracee.o $(OBJDIR)/LineInfo.o $(OBJDIR)/BreakPoints.o $(OBJDIR)/ProcessUtils.o
 	$(LD) $(LDFLAGS) -o ../bin/$@ $+ $(LIB_DWARF) $(LIB_GTEST)
 
 Test_LineInfo : $(OBJDIR)/Test_LineInfo.o $(OBJDIR)/LineInfo.o

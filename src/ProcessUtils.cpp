@@ -26,6 +26,8 @@ namespace ProcessUtils {
    constexpr char default_extra_error_message[] = "";
    constexpr unsigned int time_out_seconds=5;
    constexpr unsigned int error_message_buffer_size=50;
+   constexpr uint64_t CLEARMASK=0xffffffffffffff00;
+   constexpr uint64_t INT3=0x00000000000000cc;
    /*! \brief Brief function description here
     *
     *  Detailed description
@@ -209,7 +211,63 @@ namespace ProcessUtils {
       if(ptrace(PTRACE_TRACEME,0,0,0)<0)
          throw ProcessException(errno, "In traceMe: ");
    } 
+   /*! \brief Wrapper for PTRACE_CONT
+    *
+    *  Detailed description of the function
+    *
+    * \param Parameter Parameter description
+    * \return Return parameter description
+    */
+   void continueChild(pid_t child_pid)
+   {
+      if(ptrace(PTRACE_CONT,child_pid,NULL,0)<0)
+         throw ProcessException(errno,"In continueChild: ");
+   }
    
+   /*! \brief Wrapper for getting instruction using PTRACE_PEEKTEXT
+    *
+    *  Detailed description of the function
+    *
+    * \param Parameter Parameter description
+    * \param Parameter Parameter description
+    * \return Return parameter description
+    */
+   uint64_t getInstruction(pid_t child_pid, uint64_t instruction_address)
+   {
+      //since PEEKTEXT can return -1 as a valid data/instruction we need to check errno explicitly
+      errno=0; // reset errno
+      uint64_t inst =ptrace(PTRACE_PEEKTEXT, child_pid,(void*)(instruction_address),0);
+      if (errno != 0)
+         throw ProcessException (errno,"In getInstruction: ");
+      return inst;
+   }
+
+   /*! \brief Wrapper for PTRACE_POKETEXT to insert instruction at address
+    *
+    *  Detailed description of the function
+    *
+    * \param child_pid PID of the process to poke into
+    * \param Parameter Parameter description
+    * \param Parameter Parameter description
+    * \return Return parameter description
+    */
+   void setInstruction(pid_t child_pid, uint64_t address, uint64_t instruction)
+   {
+      if(ptrace(PTRACE_POKETEXT, child_pid, (void*)address, (void*)instruction)<0)
+         throw ProcessException (errno,"In setInstruction");
+   }
+
+   /*! \brief Function to get instruction modified to act as a trap
+    *
+    *  Detailed description of the function
+    *
+    * \param Parameter Parameter description
+    * \return Return parameter description
+    */
+   uint64_t getInstructionWithTrap(uint64_t instruction)
+   {
+      return ((instruction & CLEARMASK)|INT3);
+   }
 }
 
 

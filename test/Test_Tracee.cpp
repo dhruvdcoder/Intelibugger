@@ -34,7 +34,7 @@ namespace{
 
 
    };
-
+  
 
    TEST_F(TraceeTest,testinitialization){
       using namespace std;
@@ -62,13 +62,14 @@ namespace{
       string binary ="../bin/dummy";
       Tracee process (binary);
       process.initDwarf();
-      process.start();
+      process.load();
       process.addBreakPoint(9);
       process.continueProc();
       int status=0;
       wait(&status);
       ASSERT_TRUE(WIFSTOPPED(status));
       ASSERT_TRUE(SIGTRAP==WSTOPSIG(status));
+      cout<< "Stopped at breakpoint" <<endl;
       process.continueProc();
 
 

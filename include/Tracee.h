@@ -14,9 +14,9 @@
 #include "BreakPoints.h"
 #include <fcntl.h> // for open()
 #include <unistd.h> // for close()
-
-#define CLEARMASK 0xffffffffffffff00
-#define INT3 0xcc
+#include "ProcessUtils.h"
+//#define CLEARMASK 0xffffffffffffff00
+//#define INT3 0xcc
 enum ProcessStatus {
    NOT_STARTED=0,
    STOPPED_AT_FIRST_INST
@@ -27,10 +27,7 @@ enum ProcessStatus {
 class Tracee {
    private:
   pid_t m_pid;
-  std::string m_name;
-  std::vector<std::string> m_args_vector;
-  char*const* m_args; // args for the traced process as array of char pointers. The last pointer should point to NULL and first to the executable.
-  // TODO: modify the mechanism to take in args. Accept a string of arguments sperated by space and parse the string inside the class. 
+  ProcessUtils::ExecvArgs process_args;
    ProcessStatus m_proc_status;   
    int m_file_descriptor; // TODO better handling of file desc in Tracee.
    Dwarf_Debug m_dwarf_dbg;
@@ -44,12 +41,12 @@ class Tracee {
   pid_t getid();
  //constructor
 //   tracee(pid_t id):e_pid(id),e_name("unpecified name"),args(NULL) {}
-   Tracee(std::string prog);
+   Tracee(std::string prog); 
 // destructor : We need one now beacuse we are managing args using new
-   ~Tracee();
+   //~Tracee(){}
    // utility functions
  //
-    void start(); 
+    void load(); 
     void continueProc(); 
     //dwarf related
     void initDwarf();

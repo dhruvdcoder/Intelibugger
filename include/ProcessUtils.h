@@ -2,7 +2,7 @@
  * @brief Header for the class PtraceUtils
  */
 
-#ifndef _PROCESSUTILS_H 
+#ifndef _PROCESSUTILS_H
 #define _PROCESSUTILS_H
 
 #include <sys/ptrace.h>
@@ -26,6 +26,7 @@ namespace ProcessUtils {
    public:
       ExecvArgs(std::string full_args_string);
        ~ExecvArgs();
+      const std::string& getName() {return exe_path;}
 
        std::string exe_path; /*!< Member description */
        char * const * args;
@@ -35,12 +36,12 @@ namespace ProcessUtils {
    void loadUsingExecv(const char * path, char * const * args);
    void loadUsingExecv(const ExecvArgs& args_struct);
    void parentWaitForSignalFromChild(int SIGNAL);
-   //void continueChild(pid_t child_pid);
+   void continueChild(pid_t child_pid);
    
    //poke peek calls
-   //uint64_t getInstruction(pid_t child_pid, uint64_t instruction_address);
-   //void setInstruction(pid_t child_pid, uint64_t instruction_address, uint64_t instruction);
-   
+   uint64_t getInstruction(pid_t child_pid, uint64_t instruction_address);
+   void setInstruction(pid_t child_pid, uint64_t instruction_address, uint64_t instruction);
+   uint64_t getInstructionWithTrap(uint64_t instruction);
 
    // exceptions
    /*! \classProcessException : public std::runtime_errors
