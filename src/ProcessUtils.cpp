@@ -24,7 +24,7 @@ std::ostringstream ProcessUtils::ProcessException::buff;
 namespace ProcessUtils {
    constexpr char basic_error_prifix[] = "Process Error: ";
    constexpr char default_extra_error_message[] = "";
-   constexpr unsigned int time_out_seconds=20;
+   constexpr unsigned int time_out_seconds=5;
    constexpr unsigned int error_message_buffer_size=50;
    /*! \brief Brief function description here
     *
@@ -41,7 +41,7 @@ namespace ProcessUtils {
     *
     * \return Return parameter description
     */
-   ProcessException::ProcessException(const std::string& exp_str):runtime_error(basic_error_prifix),m_extraMessage(exp_str),m_errno(0) {
+   ProcessException::ProcessException(const std::string exp_str):runtime_error(basic_error_prifix),m_extraMessage(exp_str),m_errno(0) {
    }
  /*! \brief Brief function description here
     *
@@ -60,7 +60,7 @@ namespace ProcessUtils {
     * \param Parameter Parameter description
     * \return Return parameter description
     */
-   ProcessException::ProcessException(int err,const std::string& exp_str):runtime_error(basic_error_prifix),m_extraMessage(exp_str),m_errno(err) {
+   ProcessException::ProcessException(int err,const std::string exp_str):runtime_error(basic_error_prifix),m_extraMessage(exp_str),m_errno(err) {
       errno=0; // reset the errno once we read its value.
 
    }
@@ -198,6 +198,18 @@ namespace ProcessUtils {
    ExecvArgs::~ExecvArgs() {
      delete[] args; 
    }
+   /*! \brief Wrapper to ptrace PTRACE_TRACEME
+    *
+    *  Detailed description of the function
+    *
+    * \return Return parameter description
+    */
+   void traceMe()
+   {
+      if(ptrace(PTRACE_TRACEME,0,0,0)<0)
+         throw ProcessException(errno, "In traceMe: ");
+   } 
+   
 }
 
 

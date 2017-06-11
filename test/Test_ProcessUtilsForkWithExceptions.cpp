@@ -37,10 +37,8 @@ namespace{
       try{
          pid_t child_pid=ProcessUtils::createChild();
          if(child_pid==0){//child
-            
-            if(ptrace(PTRACE_TRACEME,0,0,0)<0)
-               perror("traceme:");
-            sleep(30);
+            ProcessUtils::traceMe();
+            sleep(100);
            // ProcessUtils::loadUsingExecv(args_struct);
          }
          else {//parent
@@ -49,8 +47,9 @@ namespace{
             ptrace(PTRACE_CONT,child_pid,NULL,0);
          }
       }
-      catch(const exception& e){
+      catch(const ProcessUtils::ProcessException& e){
          cout<<e.what()<<endl;
+         exit(0);
       }
      
    }

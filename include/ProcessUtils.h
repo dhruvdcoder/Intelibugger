@@ -12,7 +12,7 @@
 
 namespace ProcessUtils {
    //ptrace related
-   //void traceMe();
+   void traceMe();
 
    //other process control calls
    pid_t createChild();
@@ -51,15 +51,15 @@ namespace ProcessUtils {
    class ProcessException : public std::runtime_error
    {
    public:
-      ProcessException(int err, const std::string& expString);
+      ProcessException(int err, const std::string expString);
       ProcessException(int err);
-      ProcessException(const std::string& expString);
+      ProcessException(const std::string expString);
       ProcessException();
       virtual const char* what() const noexcept;
 
    private:
       static std::ostringstream buff; /*!< Member description */
-      const std::string& m_extraMessage;
+      const std::string m_extraMessage;
       int m_errno;
       
    };
