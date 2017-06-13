@@ -36,7 +36,13 @@ namespace{
 
    TEST_F(BreakPointsTest,testaddmethod){
       BreakPoints myBPs; // create the object
-      myBPs.add(1,20,30); 
+      myBPs.add(1,20,30);
+      myBPs.add(3,223,34);
+      myBPs.add(56,345,66); 
+      myBPs.add(23,345,88);
+      myBPs.print();
+      std::cout<< "Query: address 223"<<std::endl;
+      myBPs.print(223);
 
    }
 
