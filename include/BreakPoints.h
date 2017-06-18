@@ -19,7 +19,6 @@ enum bpStatus{
  
 
 
-
 /*! \class BreakPoints
  *  \brief The class works as a container for the breakpoints and hides the internal implentation of the storage.
  *
@@ -27,11 +26,6 @@ enum bpStatus{
  */
 class BreakPoints
 {
-public:
-  void add(Dwarf_Unsigned lineno, Dwarf_Addr address, uint64_t instruction);   
-  /** @todo Add a version which takes in a src file name and default it to empty */
-  void print();
-  void print(Dwarf_Addr address) ;
 private:
    struct bp {
       Dwarf_Addr m_bp_address;
@@ -47,7 +41,21 @@ private:
     typedef struct bp bp;
     std::unordered_map< uint64_t,const bp* > m_bp_map;
     std::forward_list<bp> m_breakpoints;
-    static unsigned int m_s_number_of_idx;
+    std::vector<const bp* > m_bp_vector;
+    unsigned int m_s_number_of_idx {0};
+
+public:
+  void add(Dwarf_Unsigned lineno, Dwarf_Addr address, uint64_t instruction);   
+  /** @todo Add a version which takes in a src file name and default it to empty */
+  void print();
+  void print(Dwarf_Addr address) ;
+  struct breakpoint {
+     const bp* m_Impl;
+     void print() const;
+  };
+  typedef struct breakpoint breakpoint;
+  const breakpoint getBreakpointUsingIdx(unsigned int id);
+
 };
 
 #endif //_BREAKPOINTS_H

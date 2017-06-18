@@ -3,9 +3,11 @@
  */
 #include "../include/BreakPoints.h"
 #include<iostream>
+#include<exception>
+#include<stdexcept>
+#include<new>
 
 
-unsigned int BreakPoints::m_s_number_of_idx; // definition of the static member
 
 
 /*! \brief Brief function description here
@@ -31,9 +33,21 @@ void BreakPoints::add(Dwarf_Unsigned lineno, Dwarf_Addr address, uint64_t instru
    const bp* new_bp=&(m_breakpoints.front());
    // try inserting the ref into the map. Will fail if the key already exists. In that case remove the 
    // freshly inserted element from the list as well and bail 
-   bool ok = m_bp_map.insert({address,new_bp}).second;
-   if(ok!=true)
+   /// @todo Clean the sequence below. Use one try catch
+   bool ok1 = m_bp_map.insert({address,new_bp}).second;
+   if(ok1!=true)
       m_breakpoints.pop_front();
+   try {
+      std::vector<const bp* >::iterator at;
+      at=m_bp_vector.begin() + m_s_number_of_idx-1; // 0-based vs 1-based id
+      m_bp_vector.insert(at,new_bp);
+   }
+   catch (const std::bad_alloc& e){
+      m_breakpoints.pop_front();
+      m_bp_map.erase(address);
+      /// @todo create a new exception of user defined type and throw it to indicate the failure to the client      
+   }
+
 
 }
 
@@ -69,4 +83,26 @@ void BreakPoints::print()  {
  */
 void BreakPoints::print(Dwarf_Addr address)  {
    m_bp_map[address]->print();
+}
+
+/*! \brief Brief function description here
+ *
+ *  Detailed description
+ *
+ * \param Parameter Parameter description
+ * \return Return parameter description
+ */
+const BreakPoints::breakpoint BreakPoints::getBreakpointUsingIdx(unsigned int id) {
+   return breakpoint{m_bp_vector[id-1]}; /// @todo check for bounds error
+   // 0-based idx base vs 1-based idx
+}
+
+/*! \brief Brief function description here
+ *
+ *  Detailed description
+ *
+ * \return Return parameter description
+ */
+void BreakPoints::breakpoint::print() const{
+   m_Impl->print();
 }
