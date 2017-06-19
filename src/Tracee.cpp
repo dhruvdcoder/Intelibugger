@@ -170,3 +170,13 @@ void Tracee::addBreakPoint(Dwarf_Unsigned line_number,const std::string& file_na
    m_breakpoints.add(line_number, m_line_info.getAddressFromLine(line_number), instruction);
    
 }
+
+/*! \brief Brief function description here
+ *
+ *  Detailed description
+ *
+ * \return Return parameter description
+ */
+const BreakPoints& Tracee::getBreakPoints() {
+   return m_breakpoints;
+}

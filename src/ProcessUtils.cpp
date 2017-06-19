@@ -10,6 +10,7 @@
 #include <cstring> // for std::strerror
 #include <sys/types.h>// for wait
 #include <sys/wait.h> // for wait
+#include <sys/user.h> // for user_reg_struct
 #include <unistd.h> // for alarm()
 #include <string.h> // for sys_signame()
 #include <vector>
@@ -268,6 +269,90 @@ namespace ProcessUtils {
    {
       return ((instruction & CLEARMASK)|INT3);
    }
+
+   /*! \brief Fetches the values of the registers and stores in the member.
+    *
+    *  Detailed description
+    *
+    * \param Parameter Parameter description
+    * \return Return parameter description
+    */
+   void Registers::fetch(pid_t pid) {
+      if (ptrace(PTRACE_GETREGS,pid,NULL,&m_registers)<0)
+         throw ProcessException (errno,"In Registers::fetch");
+      isInitialized=true;
+   }
+
+   /*! \brief Brief function description here
+    *
+    *  Detailed description
+    *
+    * \return Return parameter description
+    */
+   uint64_t Registers::getInstructionPointer() {
+     if (isInitialized)
+        return m_registers.rip;
+     else 
+        throw ProcessException("In Registers::getInstruction : The user_regs_struct was not initialized");
+   }
+   
+   /*! \brief Brief function description here
+    *
+    *  Detailed description of the function
+    *
+    * \param pid Parameter description
+    * \return Return parameter description
+    */
+   uint64_t getInstructionPointer(pid_t pid)
+   {
+      Registers temp_regs;
+      temp_regs.fetch(pid);
+      return temp_regs.getInstructionPointer();
+   }
+
+   /*! \brief Brief function description here
+    *
+    *  Detailed description
+    *
+    * \param Parameter Parameter description
+    * \return Return parameter description
+    */
+   void Registers::setInstructionPointer(uint64_t rip) {
+      if (isInitialized)
+         m_registers.rip = rip;
+      else 
+         throw ProcessException ("In Registers::setInstructionPointer : The user_regs_struct was not initialized."); 
+   }
+
+   /*! \brief Brief function description here
+    *
+    *  Detailed description of the function
+    *
+    * \param Parameter Parameter description
+    * \return Return parameter description
+    */
+   void setInstructionPointer(pid_t pid,uint64_t rip)
+   {
+      Registers temp_regs;
+      temp_regs.fetch(pid);
+      temp_regs.setInstructionPointer(rip);
+      if (ptrace(PTRACE_SETREGS,pid,NULL,&(temp_regs.m_registers)) < 0)
+         throw ProcessException (errno, "In ProcessUtils::setInstructionPointer");
+   }
+
+   /*! \brief Brief function description here
+    *
+    *  Detailed description of the function
+    *
+    * \param pid Parameter description
+    * \return Return parameter description
+    */
+   void singleStepChild(pid_t pid)
+   {
+      if (ptrace(PTRACE_SINGLESTEP,pid,NULL,NULL) < 0)
+         throw ProcessException (errno, "In ProcessUtils::singleStepChild");
+   }
 }
+
 
 

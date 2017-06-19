@@ -54,6 +54,7 @@ class Tracee {
 
     // BreakPoints related
     void addBreakPoint(Dwarf_Unsigned line_number,const std::string& src_file="");
+    const BreakPoints& getBreakPoints();
 
      
 };

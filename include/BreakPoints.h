@@ -11,6 +11,7 @@
 #include <string>
 #include <unordered_map>
 #include <forward_list>
+#include "ProcessUtils.h"
 
 enum bpStatus{
    bp_inactive=0,
@@ -50,12 +51,21 @@ public:
   void print();
   void print(Dwarf_Addr address) ;
   struct breakpoint {
+     
      const bp* m_Impl;
+     
      void print() const;
+     uint64_t getAddress() const;
+     uint64_t getAddress();
+     uint64_t getInstruction();
+     uint64_t getInstruction() const;
   };
   typedef struct breakpoint breakpoint;
   const breakpoint getBreakpointUsingIdx(unsigned int id);
-
+  const breakpoint getCurrentBreakpoint(pid_t pid);
+  const breakpoint getCurrentBreakpoint(pid_t pid) const;
+  void continueAfterBreakPoint(pid_t pid) const;
+  void continueAfterBreakPoint(pid_t pid);
 };
 
 #endif //_BREAKPOINTS_H

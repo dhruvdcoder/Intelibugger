@@ -6,8 +6,9 @@
 #include<exception>
 #include<stdexcept>
 #include<new>
+#include <cassert>
 
-
+constexpr unsigned int max_offset_after_int3 = 1;
 
 
 /*! \brief Brief function description here
@@ -105,4 +106,95 @@ const BreakPoints::breakpoint BreakPoints::getBreakpointUsingIdx(unsigned int id
  */
 void BreakPoints::breakpoint::print() const{
    m_Impl->print();
+}
+
+/*! \brief Brief function description here
+ *
+ *  Detailed description
+ *
+ * \param Parameter Parameter description
+ * \return Return parameter description
+ */
+const BreakPoints::breakpoint BreakPoints::getCurrentBreakpoint(pid_t pid) const {
+   uint64_t rip = ProcessUtils::getInstructionPointer(pid);
+   const bp* pbp=nullptr;
+   for (unsigned int ii=1; ii <= max_offset_after_int3;++ii){
+      uint64_t instruction_address = rip - ii;
+      try {
+         pbp = m_bp_map.at(instruction_address);
+      }
+      catch (const std::out_of_range& e) {
+         if ( ii ==max_offset_after_int3) // throw now
+            throw ProcessUtils::ProcessException ("In BreakPoints::getCurrentBreakpoint : Could not find breakpoint.");
+         continue; // retry
+      }
+      break; // break if try succeeds
+   }
+   assert(pbp != nullptr);
+   return breakpoint{pbp};
+}
+
+/*! \brief Brief function description here
+ *
+ *  Detailed description
+ *
+ * \param Parameter Parameter description
+ * \return Return parameter description
+ */
+const BreakPoints::breakpoint BreakPoints::getCurrentBreakpoint(pid_t pid) {
+   const BreakPoints* cBP = static_cast<const BreakPoints* >(this);
+   return cBP->getCurrentBreakpoint(pid);
+}
+
+/*! \brief Brief function description here
+ *
+ *  Detailed description
+ *
+ * \return Return parameter description
+ */
+uint64_t BreakPoints::breakpoint::getAddress() const {
+   return m_Impl->m_bp_address;
+}
+
+/*! \brief Brief function description here
+ *
+ *  Detailed description
+ *
+ * \return Return parameter description
+ */
+uint64_t BreakPoints::breakpoint::getAddress()  {
+   const BreakPoints::breakpoint* cbp = static_cast<const BreakPoints::breakpoint* >(this);
+   return cbp->getAddress();
+}
+
+/*! \brief Brief function description here
+ *
+ *  Detailed description
+ *
+ * \return Return parameter description
+ */
+uint64_t BreakPoints::breakpoint::getInstruction() const {
+   return m_Impl->m_instruction;
+   
+}
+
+
+/*! \brief Brief function description here
+ *
+ *  Detailed description
+ *
+ * \param Parameter Parameter description
+ * \return Return parameter description
+ */
+void BreakPoints::continueAfterBreakPoint(pid_t pid) const {
+   const breakpoint bp = getCurrentBreakpoint(pid);
+   uint64_t original_instruction = bp.getInstruction();
+   uint64_t address = bp.getAddress();
+   ProcessUtils::setInstruction(pid,address,original_instruction);
+   ProcessUtils::setInstructionPointer(pid,address);
+   ProcessUtils::singleStepChild(pid);
+   ProcessUtils::parentWaitForSignalFromChild(SIGTRAP);
+   ProcessUtils::setInstruction(pid,address,ProcessUtils::getInstructionWithTrap(original_instruction));
+   ProcessUtils::continueChild(pid);
+    
 }
