@@ -8,7 +8,8 @@ This README would normally document whatever steps are necessary to get your app
 	1. Presenting variour views of the code like call graph at different granularities using the execution profile.
 	2. Map the top-level changes in the program behavior (can be represented using test programs) to sites in code. (The intellegent part)
 * Version : 1.0
-
+### Progress so far ###
+* Working on the basic skeleton of debugger and the first feature of creating callgraphs.
 ### How do I get set up? ###
 
 
